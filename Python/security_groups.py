@@ -6,4 +6,4 @@ sg = ec2.describe_security_groups()
 
 sg_data = json.dumps(sg, indent=4)
 
-print(security_groups)
+print(sg_data)
