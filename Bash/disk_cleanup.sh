@@ -2,9 +2,7 @@ echo What is the INC?
 read d
 
 while read v; do
-    aws ec2 create-snapshot \
-    --region us-east-1 --volume-id $v --description "$d - $v" \
-    --query "SnapshotId" --output text >> snapshot_ids
+    aws ec2 create-snapshot --region us-east-1 --volume-id $v --description "$d - $v" --query "SnapshotId" --output text >> snapshot_ids
 done < vol_ids
 
 #Empty variables
