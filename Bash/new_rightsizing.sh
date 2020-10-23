@@ -24,6 +24,8 @@ single_function () {
     echo What instance type is required?
     read t
 
+    if [[ $t == "t3" ]]
+
     ena_function
 
     #State that there is only 1 line in the 'single_id' file
@@ -56,47 +58,52 @@ single_function () {
 }
 
 multiple_function () {
-    #Save instance type to variable
-    echo What instance type is required?
-    read t
+    if [ -s 'instance_list' ]; then
+        #Save instance type to variable
+        echo What instance type is required?
+        read t
 
-    ena_function
+        ena_function
 
-    #Grabs a count of instances in the 'instance_list' file
-    count=$(wc -l instance_list | cut -d ' ' -f 1)
+        #Grabs a count of instances in the 'instance_list' file
+        count=$(wc -l instance_list | cut -d ' ' -f 1)
 
-    printf "\nOK. Changing instance type to $t\n"
+        printf "\nOK. Changing instance type to $t\n"
 
-    #Stop instances in 'instance_list'
-    while read a; do
-        printf "\nStopping $a\n"
-        aws ec2 stop-instances --instance-ids $a
-    done < instance_list
-
-    #While the empty variable does not equal the count of instances in 'instance_list'...
-    while [[ $instance_count != $count ]]; do
-        #While reading 'instance_list'
+        #Stop instances in 'instance_list'
         while read a; do
-            #Function that checks instance state
-            result=$(aws ec2 describe-instances --instance-id $a --query "Reservations[*].Instances[*].State.Name" --output text)
-            
-            #Run the function to view status
-            for status in $result; do
-                #If the result doesn't return "stopped", skip it and move to the next one
-                if [[ $status != "stopped" ]]; then
-                    continue
-                #If the result does return "stopped", change the ENA attribute and instance type, then start the instance up
-                else
-                    aws ec2 modify-instance-attribute --instance-id $a $ena
-                    aws ec2 modify-instance-attribute --instance-id $a --instance-type $t
-                    printf "\nStarting $a\n"
-                    aws ec2 start-instances --instance-ids $a
-                    #Add 1 to the empty variable
-                    ((instance_count++))
-                fi
-            done
+            printf "\nStopping $a\n"
+            aws ec2 stop-instances --instance-ids $a
         done < instance_list
-    done
+
+        #While the empty variable does not equal the count of instances in 'instance_list'...
+        while [[ $instance_count != $count ]]; do
+            #While reading 'instance_list'
+            while read a; do
+                #Function that checks instance state
+                result=$(aws ec2 describe-instances --instance-id $a --query "Reservations[*].Instances[*].State.Name" --output text)
+                
+                #Run the function to view status
+                for status in $result; do
+                    #If the result doesn't return "stopped", skip it and move to the next one
+                    if [[ $status != "stopped" ]]; then
+                        continue
+                    #If the result does return "stopped", change the ENA attribute and instance type, then start the instance up
+                    else
+                        aws ec2 modify-instance-attribute --instance-id $a $ena
+                        aws ec2 modify-instance-attribute --instance-id $a --instance-type $t
+                        printf "\nStarting $a\n"
+                        aws ec2 start-instances --instance-ids $a
+                        #Add 1 to the empty variable
+                        ((instance_count++))
+                    fi
+                done
+            done < instance_list
+        done
+    else
+        echo "There are no instance IDs added to the 'instance_list' text file. Please add instance IDs before proceeding."
+        exit
+    fi
 }
 
 #Function to ask if ENA support is required, and creates a variable for the 'modify-instance-attribute' AWS CLI calls
@@ -105,7 +112,7 @@ single_or_multiple () {
     read response
     if [[ $response == "y" ]]; then
         single_function
-    elif [[ $reponse == "n" ]]; then
+    elif [[ $response == "n" ]]; then
         multiple_function
     else
         echo "Sorry, that is not a valid response."
