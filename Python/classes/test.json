@@ -1,0 +1,46 @@
+{
+    "UserInformation": [
+        {
+            "firstName": "Gus",
+            "lastName": "Silva",
+            "userName": "gsilva",
+            "Feelings": [
+                "Loved",
+                "Missed",
+                "Envied"
+            ],
+            "Computer": {
+                "Make": "Apple",
+                "Model": "M1 MacBook Pro"
+            }
+        },
+        {
+            "firstName": "Liz",
+            "lastName": "Silva",
+            "userName": "lsilva",
+            "Feelings": [
+                "Stressed",
+                "Tired",
+                "Motivated"
+            ],
+            "Computer": {
+                "Make": "HP",
+                "Model": "Spectre x360"
+            }
+        },
+        {
+            "firstName": "Roberto",
+            "lastName": "Aquino",
+            "userName": "raquino",
+            "Feelings": [
+                "Excited",
+                "Tired",
+                "Annoyed"
+            ],
+            "Computer": {
+                "Make": "Dell",
+                "Model": "XPS 15"
+            }
+        }
+    ]
+}
